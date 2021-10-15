@@ -2,7 +2,7 @@ import {Message} from "./Message";
 import {MessageType} from "./MessageType";
 
 export interface UpdateReplacementsMessagePayload {
-    searchText: string;
+    searchTexts: string[];
     replaceHtml: string;
 }
 

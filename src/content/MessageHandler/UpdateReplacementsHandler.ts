@@ -12,7 +12,7 @@ export class UpdateReplacementsHandler extends MessageHandler<MessageType.Update
     }
 
     async execute(payload: UpdateReplacementsMessagePayload): Promise<void> {
-        this.textReplacer.configure(payload.searchText, payload.replaceHtml);
+        this.textReplacer.configure(payload.searchTexts, payload.replaceHtml);
     }
 
 }

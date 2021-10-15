@@ -6,7 +6,7 @@ export interface BlockerConfigurationLoaderRow {
 }
 
 export interface BlockerConfigurationReplacements {
-    searchText: string;
+    searchTexts: string[];
     replaceHtml: string;
 }
 

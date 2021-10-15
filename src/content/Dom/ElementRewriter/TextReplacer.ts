@@ -5,16 +5,18 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
 
     readonly type = ElementRewriterType.TextReplacer;
 
-    private normalizedSearchText: string | undefined;
+    private normalizedSearchTexts: string[] | undefined;
+    private normalizedSearchTextsMinLen: number = 0;
     private replacementHtml: string | undefined;
 
-    configure(searchText: string, replacementHtml: string) {
-        this.normalizedSearchText = TextReplacer.normalizeText(searchText);
+    configure(searchTexts: string[], replacementHtml: string) {
+        this.normalizedSearchTexts = searchTexts.map(searchText => TextReplacer.normalizeText(searchText));
+        this.normalizedSearchTextsMinLen = Math.min(...this.normalizedSearchTexts.map(s => s.length));
         this.replacementHtml = replacementHtml;
     }
 
     private isReady(): boolean {
-        return this.normalizedSearchText !== undefined && this.replacementHtml !== undefined;
+        return this.normalizedSearchTexts !== undefined && this.replacementHtml !== undefined;
     }
 
     rewrite(element: Element): Element | undefined {
@@ -67,14 +69,19 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
     private textNodeContainsSearchText(textNode: Text): boolean {
         const textContent = textNode.textContent;
 
-        if (!textContent || textContent.length < this.normalizedSearchText!.length) {
+        if (!textContent || textContent.length < this.normalizedSearchTextsMinLen) {
             return false;
         }
 
         const normalizedNodeText = TextReplacer.normalizeText(textContent);
 
-        return normalizedNodeText.length >= this.normalizedSearchText!.length
-            && normalizedNodeText.includes(this.normalizedSearchText!);
+        for (let nst of this.normalizedSearchTexts!) {
+            if (normalizedNodeText.length >= nst.length && normalizedNodeText.includes(nst)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static normalizeText(text: string) {
