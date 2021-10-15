@@ -6,7 +6,7 @@ const staticMap: BlockerConfigurationLoaderResult = {
             domainName: 'meduza.io',
             selectors: [
                 {selector: '#div-gpt-ad'},
-                {selector: '.ebala .look-how-they-massacred-my-boy'}
+                {selector: '.ebala .look-how-they-massacred-my-boy'},
             ],
         },
         {
@@ -35,6 +35,12 @@ const staticMap: BlockerConfigurationLoaderResult = {
                     selector: '.Pandora-container',
                     styleTweaks: [{selector: '.Header_LogoWrapper', styles: {display: 'none'}}],
                 },
+            ],
+        },
+        {
+            domainName: 'golosinfo.org',
+            selectors: [
+                {selector: '.author_inoagent__html'},
             ],
         },
     ],
