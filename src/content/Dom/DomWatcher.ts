@@ -86,18 +86,26 @@ export class DomWatcher {
     }
 
     private scanNodes(nodes: Element[]) {
-        const nodesToProcess: Map<Element, ElementRewriterType | undefined> = new Map();
+        const nodesToProcess: Map<Element, SelectorConfiguration> = new Map();
         nodes.forEach(node => this.scan(node, nodesToProcess));
 
-        for (const [node, rewriterType] of nodesToProcess.entries()) {
-            this.processNode(node, rewriterType);
+        for (const [node, selectorConfig] of nodesToProcess.entries()) {
+            this.processNode(node, selectorConfig);
         }
     }
 
-    private processNode(node: Element, rewriterType: ElementRewriterType | undefined) {
+    private processNode(node: Element, selectorConfig: SelectorConfiguration) {
         this.processedNodes.add(node);
-        const marker = this.elementProcessor.process(node, rewriterType);
+        this.applyStyleTweaks(selectorConfig);
+        const marker = this.elementProcessor.process(node, selectorConfig.rewriterType);
         marker && this.observeProcessedNode(node, marker);
+    }
+
+    private applyStyleTweaks(selectorConfig: SelectorConfiguration) {
+        selectorConfig.styleTweaks?.forEach(tweak => {
+            const elements = document.documentElement.querySelectorAll(tweak.selector);
+            elements.forEach(element => element instanceof HTMLElement && Object.assign(element.style, tweak.styles));
+        });
     }
 
     private observeProcessedNode(node: Element, marker: Element) {
@@ -117,7 +125,7 @@ export class DomWatcher {
         });
     }
 
-    private scan(node: Node, nodesToProcess: Map<Element, ElementRewriterType | undefined>) {
+    private scan(node: Node, nodesToProcess: Map<Element, SelectorConfiguration>) {
         if (!this.selectors) {
             return;
         }
@@ -128,17 +136,17 @@ export class DomWatcher {
         if (DomWatcher.IGNORE_TAGS.has(element.localName)) {
             return;
         }
-        const addNodeToProcess = (element: Element, rewriterType: ElementRewriterType | undefined) => {
-            nodesToProcess.has(element) || nodesToProcess.set(element, rewriterType);
+        const addNodeToProcess = (element: Element, selectorConfig: SelectorConfiguration) => {
+            nodesToProcess.has(element) || nodesToProcess.set(element, selectorConfig);
         };
         for (const selectorConfig of this.selectors) {
             if (element.matches(selectorConfig.selector)) {
-                addNodeToProcess(element, selectorConfig.rewriterType);
+                addNodeToProcess(element, selectorConfig);
             } else {
                 const matches = element.querySelectorAll(selectorConfig.selector);
                 if (matches) {
                     for (const match of matches) {
-                        addNodeToProcess(match, selectorConfig.rewriterType);
+                        addNodeToProcess(match, selectorConfig);
                     }
                 }
             }

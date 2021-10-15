@@ -30,6 +30,10 @@ const staticMap: BlockerConfigurationLoaderResult = {
             domainName: 'istories.media',
             selectors: [
                 {selector: '.ForeignAgentBanner'},
+                {
+                    selector: '.Pandora-container',
+                    styleTweaks: [{selector: '.Header_LogoWrapper', styles: {display: 'none'}}],
+                },
             ],
         },
     ],
