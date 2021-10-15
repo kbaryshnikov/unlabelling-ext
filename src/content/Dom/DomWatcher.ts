@@ -1,6 +1,5 @@
 import {ElementProcessor} from "./ElementProcessor";
 import {SelectorConfiguration} from "../../lib/SelectorConfiguration";
-import {ElementRewriterType} from "../../lib/ElementRewriterType";
 
 export class DomWatcher {
 
@@ -55,7 +54,7 @@ export class DomWatcher {
         let hasAddedNodes = false;
         for (const mutation of mutations) {
             for (const node of mutation.addedNodes) {
-                if (node.nodeType === Node.ELEMENT_NODE && !this.processedNodes.has(node as Element)) {
+                if (node.nodeType === Node.ELEMENT_NODE && !this.isProcessedElement(node as Element)) {
                     this.addedNodes.add(node as Element);
                     hasAddedNodes = true;
                 }
@@ -71,7 +70,19 @@ export class DomWatcher {
             return;
         }
 
-        this.processAddedNodes();
+        requestAnimationFrame(() => this.processAddedNodes());
+    }
+
+    private isProcessedElement(element: Element): boolean {
+        if (this.processedNodes.has(element)) {
+            return true;
+        }
+        for (let processedNode of this.processedNodes) {
+            if (processedNode.contains(element)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private processAddedNodes() {

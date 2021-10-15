@@ -6,6 +6,7 @@ const staticMap: BlockerConfigurationLoaderResult = {
             domainName: 'meduza.io',
             selectors: [
                 {selector: '#div-gpt-ad'},
+                {selector: '.ebala .look-how-they-massacred-my-boy'}
             ],
         },
         {
