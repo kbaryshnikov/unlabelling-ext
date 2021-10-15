@@ -1,0 +1,25 @@
+{
+  "name": "inoblock",
+  "version": "1.0.0",
+  "description": "\"Inoagent\" messages blocker",
+  "main": "background.ts",
+  "scripts": {
+    "build": "NODE_ENV=production webpack",
+    "dev": "NODE_ENV=development webpack",
+    "watch": "NODE_ENV=development webpack --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Konstantin Baryshnikov",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/webextension-polyfill": "^0.8.0",
+    "typescript": "^4.4.3",
+    "webextension-polyfill": "^0.8.0",
+    "webpack": "^5.56.1",
+    "webpack-cli": "^4.8.0"
+  },
+  "dependencies": {
+    "copy-webpack-plugin": "^9.0.1",
+    "ts-loader": "^9.2.6"
+  }
+}
