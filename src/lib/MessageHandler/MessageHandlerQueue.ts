@@ -61,7 +61,7 @@ export class MessageHandlerQueue {
     }
 
     push(...messages: Message<any, any>[]) {
-        messages.forEach(message => this.queue.push(message));
+        this.queue.push(...messages);
         this.run();
     }
 
