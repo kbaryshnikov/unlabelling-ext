@@ -8,11 +8,13 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
     private normalizedSearchTexts: string[] | undefined;
     private normalizedSearchTextsMinLen: number = 0;
     private replacementHtml: string | undefined;
+    private substitutions: Record<string, string>[] | undefined = undefined;
 
-    configure(searchTexts: string[], replacementHtml: string) {
+    configure(searchTexts: string[], replacementHtml: string, substitutions: Record<string, string>[]) {
         this.normalizedSearchTexts = searchTexts.map(searchText => TextReplacer.normalizeText(searchText));
         this.normalizedSearchTextsMinLen = Math.min(...this.normalizedSearchTexts.map(s => s.length));
         this.replacementHtml = replacementHtml;
+        this.substitutions = substitutions;
     }
 
     private isReady(): boolean {
@@ -26,23 +28,33 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
         }
 
         const textNode = this.findReplacementTextNode(element);
+        const replacementHtml = this.generateReplacementHtml();
 
         if (textNode?.parentNode) {
             const replacement = document.createElement('span');
             textNode.parentNode.insertBefore(replacement, textNode);
             textNode.parentNode.removeChild(textNode);
-            replacement.outerHTML = this.replacementHtml!;
+            replacement.outerHTML = replacementHtml!;
             console.log('replace1', replacement.outerHTML);
             return replacement;
         } else {
             const marker = document.createElement('span');
             marker.setAttribute('hidden', 'hidden');
             marker.style.visibility = 'none';
-            element.innerHTML = this.replacementHtml!;
+            element.innerHTML = replacementHtml!;
             element.appendChild(marker);
             console.log('replace2', element.innerHTML);
             return marker;
         }
+    }
+
+    private generateReplacementHtml(): string {
+        if (!this.substitutions) {
+            return this.replacementHtml!;
+        }
+        const randomIndex = Math.floor(Math.random() * this.substitutions.length);
+        const substitition = this.substitutions[randomIndex];
+        return this.replacementHtml!.replace(/\${([\w\d_]+)}/ig, (match, key) => substitition[key] ?? match);
     }
 
     private findReplacementTextNode(root: Element): Text | undefined {

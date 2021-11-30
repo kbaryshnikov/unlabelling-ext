@@ -75,7 +75,10 @@ export class TabsListener {
 
         const updateReplacementsMessage: UpdateReplacementsMessage = {
             type: MessageType.UpdateReplacements,
-            payload: this.blockerConfiguration.replacementsConfig,
+            payload: {
+                ...this.blockerConfiguration.replacementsConfig,
+                substitutions: this.blockerConfiguration.substitutions,
+            },
         };
         const updateSelectorsMessage = {
             type: MessageType.UpdateSelectors,

@@ -1,39 +1,62 @@
 import {
     BlockerConfigurationLoader,
-    BlockerConfigurationLoaderResult,
+    BlockerConfigurationLoaderResult, BlockerConfigurationPetitionSignerOrgs,
     BlockerConfigurationReplacements,
 } from "./BlockerConfigurationLoader";
 import {SelectorConfiguration} from "../../lib/SelectorConfiguration";
+import {BlockerConfigurationStorage} from "./BlockerConfigurationStorage";
 
 export class BlockerConfiguration {
 
+    private static DEFAULT_UPDATE_FREQUENCY_MINUTES = 60;
+    private static RESTART_ON_FAILURE_SECONDS = 10;
+
     private map: Map<string, SelectorConfiguration[] | undefined> = new Map();
     private replacements: BlockerConfigurationReplacements | undefined = undefined;
-    private lastUpdated: number = 0;
+    private petitionSigners: BlockerConfigurationPetitionSignerOrgs[] | undefined = undefined;
 
     constructor(private readonly loader: BlockerConfigurationLoader,
-                private readonly fallbackLoader?: BlockerConfigurationLoader | undefined) {
+                private readonly storage: BlockerConfigurationStorage,
+                private readonly updateFrequencyMinutes: number) {
+        if (!(this.updateFrequencyMinutes > 0)) {
+            this.updateFrequencyMinutes = BlockerConfiguration.DEFAULT_UPDATE_FREQUENCY_MINUTES;
+        }
+    }
+
+    start(): Promise<void> {
+        console.log('start');
+        return new Promise(resolve => {
+            this.load().then(() => {
+                console.log('loaded');
+                resolve();
+                setInterval(() => this.load(), this.updateFrequencyMinutes * 60 * 1000);
+            }).catch(error => {
+                console.log(error);
+                setTimeout(() => this.start(), BlockerConfiguration.RESTART_ON_FAILURE_SECONDS * 1000);
+            });
+        });
     }
 
     async load(): Promise<void> {
         const result = await this.doLoad();
+        if (!result) {
+            throw new Error('Failed to load');
+        }
         this.map.clear();
         this.replacements = result.replacements;
-        for (const row of result.rows) {
+        this.petitionSigners = result.petitionSignerOrgs;
+        for (const row of result.selectors) {
             this.map.set(row.domainName, row.selectors);
         }
-        this.lastUpdated = result.updatedAt;
     }
 
-    private async doLoad(): Promise<BlockerConfigurationLoaderResult> {
+    private async doLoad(): Promise<BlockerConfigurationLoaderResult | undefined> {
         try {
-            return this.loader.load();
+            const result = await this.loader.load();
+            await this.storage.store(result);
+            return result;
         } catch (e) {
-            if (this.fallbackLoader) {
-                return this.fallbackLoader.load();
-            } else {
-                throw e;
-            }
+            return this.storage.load();
         }
     }
 
@@ -44,8 +67,11 @@ export class BlockerConfiguration {
         return this.replacements;
     }
 
-    public get lastUpdatedAt(): number {
-        return this.lastUpdated;
+    public get substitutions(): Record<string, string>[] {
+        if (!this.petitionSigners) {
+            throw new Error('Petition signers were not loaded');
+        }
+        return this.petitionSigners as Record<string, any>[];
     }
 
     find(normalizedDomainName: string): SelectorConfiguration[] | undefined {

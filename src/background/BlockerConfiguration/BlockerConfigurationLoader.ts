@@ -1,6 +1,6 @@
 import {SelectorConfiguration} from "../../lib/SelectorConfiguration";
 
-export interface BlockerConfigurationLoaderRow {
+export interface BlockerConfigurationSelectorsSet {
     domainName: string;
     selectors: SelectorConfiguration[] | undefined;
 }
@@ -10,10 +10,17 @@ export interface BlockerConfigurationReplacements {
     replaceHtml: string;
 }
 
+export interface BlockerConfigurationPetitionSignerOrgs {
+    name: string;
+    title: string;
+    titleAccusative: string;
+    websiteUrl: string;
+}
+
 export interface BlockerConfigurationLoaderResult {
-    rows: BlockerConfigurationLoaderRow[];
+    selectors: BlockerConfigurationSelectorsSet[];
     replacements: BlockerConfigurationReplacements;
-    updatedAt: number;
+    petitionSignerOrgs: BlockerConfigurationPetitionSignerOrgs[];
 }
 
 export abstract class BlockerConfigurationLoader {
