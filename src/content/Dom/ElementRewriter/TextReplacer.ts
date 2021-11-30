@@ -28,6 +28,7 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
         }
 
         const textNode = this.findReplacementTextNode(element);
+        console.log('replacing');
         const replacementHtml = this.generateReplacementHtml();
 
         if (textNode?.parentNode) {
@@ -54,6 +55,7 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
         }
         const randomIndex = Math.floor(Math.random() * this.substitutions.length);
         const substitition = this.substitutions[randomIndex];
+        console.log(99, substitition);
         return this.replacementHtml!.replace(/\${([\w\d_]+)}/ig, (match, key) => substitition[key] ?? match);
     }
 

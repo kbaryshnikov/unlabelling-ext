@@ -14,7 +14,6 @@ export class Messenger {
         }
         this.port = browser.runtime.connect();
         this.port.onMessage.addListener(message => {
-            console.log(message);
             if ('type' in message && 'payload' in message && this.handlerQueue.isKnownMessageType(message.type)) {
                 this.handlerQueue.push(message);
             }

@@ -28,7 +28,6 @@ export class TabsListener {
     onPortConnected(port: ContentScriptPort, url: string | undefined) {
         this.ports.set(port.tabId, port);
         const initMessage = this.initMessages.get(port.tabId);
-        console.log('onPort', port.tabId, initMessage, url);
         if (initMessage) {
             this.initMessages.delete(port.tabId);
             port.sendMessage(initMessage);
@@ -43,7 +42,6 @@ export class TabsListener {
     }
 
     private onTabUpdated(tabId: number, info: Tabs.OnUpdatedChangeInfoType, tab: Tabs.Tab) {
-        console.log(info);
         switch (info.status) {
             case 'loading':
                 const url = info.url || tab.url;

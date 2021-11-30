@@ -15,7 +15,6 @@ export class DomWatcher {
 
     updateSelectors(selectors: SelectorConfiguration[] | undefined) {
         this.selectors = selectors?.length ? selectors : undefined;
-        console.log('updateSelectors', this.selectors);
         if (this.selectors) {
             if (!this.mutationObserver) {
                 this.scanNodes([document.documentElement]);
@@ -30,7 +29,6 @@ export class DomWatcher {
         if (this.mutationObserver) {
             return;
         }
-        console.log('start');
         this.addedNodes.clear();
         this.processedNodes.clear();
         this.mutationObserver = new MutationObserver(this.observe.bind(this));
@@ -47,7 +45,6 @@ export class DomWatcher {
         this.mutationObserver = undefined;
         this.addedNodes.clear();
         this.processedNodes.clear();
-        console.log('stop');
     }
 
     private observe(mutations: MutationRecord[]) {
@@ -120,12 +117,10 @@ export class DomWatcher {
     }
 
     private observeProcessedNode(node: Element, marker: Element) {
-        const observer = new MutationObserver(mutations => {
-            console.log(mutations);
+        const observer = new MutationObserver(() => {
             if (node.parentNode?.contains(node) && !node.contains(marker)) {
                 observer.disconnect();
                 this.addedNodes.add(node);
-                console.log("reprocess");
                 this.processAddedNodes();
             }
         });

@@ -13,7 +13,6 @@ export class ElementProcessor {
     }
 
     process(element: Element, rewriterType: ElementRewriterType | undefined): Element | void {
-        console.log(element, rewriterType);
         const rewriter = this.rewritersMap.get(rewriterType || DEFAULT_ELEMENT_REWRITER_TYPE);
         if (!rewriter) {
             console.error(`Unknown rewriter type: '${rewriterType}'`);

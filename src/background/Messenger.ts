@@ -13,7 +13,6 @@ export class Messenger {
     }
 
     private onPortConnected(port: Runtime.Port) {
-        console.log('connected', port);
         const tabId = port.sender?.tab?.id;
         if (!tabId) {
             return;

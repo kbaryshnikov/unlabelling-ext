@@ -8,14 +8,13 @@ export class BlockerConfigurationFetchLoader extends BlockerConfigurationLoader 
 
     async load(): Promise<BlockerConfigurationLoaderResult> {
         const result = await fetch(this.fetchUrl);
-        if (result.ok) {
+        if (!result.ok) {
             throw new Error('Failed to load config');
         }
         const config = await result.json();
         if (!config['selectors'] || !config['replacements']) {
             throw new Error('Malformed config loaded');
         }
-        console.log(config);
         return config as BlockerConfigurationLoaderResult;
     }
 

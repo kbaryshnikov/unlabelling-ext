@@ -24,14 +24,12 @@ export class BlockerConfiguration {
     }
 
     start(): Promise<void> {
-        console.log('start');
         return new Promise(resolve => {
             this.load().then(() => {
-                console.log('loaded');
                 resolve();
                 setInterval(() => this.load(), this.updateFrequencyMinutes * 60 * 1000);
             }).catch(error => {
-                console.log(error);
+                console.warn(error);
                 setTimeout(() => this.start(), BlockerConfiguration.RESTART_ON_FAILURE_SECONDS * 1000);
             });
         });

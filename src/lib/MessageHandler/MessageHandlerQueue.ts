@@ -47,7 +47,6 @@ export class MessageHandlerQueue {
         try {
             const handler = this.handlersMap.get(message.type);
             if (handler) {
-                console.log(message);
                 const result = await handler.execute(message.payload);
                 if (result?.length) {
                     this.queue.push(...result);
