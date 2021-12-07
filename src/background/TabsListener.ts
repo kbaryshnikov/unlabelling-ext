@@ -41,6 +41,7 @@ export class TabsListener {
         browser.tabs.onRemoved.addListener(tabId => {
             this.tabs.delete(tabId);
             this.ports.delete(tabId);
+            this.initMessages.delete(tabId);
         });
     }
 
