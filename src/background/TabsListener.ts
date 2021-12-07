@@ -38,7 +38,10 @@ export class TabsListener {
 
     private setupListener() {
         browser.tabs.onUpdated.addListener(this.onTabUpdated.bind(this));
-        browser.tabs.onRemoved.addListener(tabId => this.tabs.delete(tabId));
+        browser.tabs.onRemoved.addListener(tabId => {
+            this.tabs.delete(tabId);
+            this.ports.delete(tabId);
+        });
     }
 
     private onTabUpdated(tabId: number, info: Tabs.OnUpdatedChangeInfoType, tab: Tabs.Tab) {
