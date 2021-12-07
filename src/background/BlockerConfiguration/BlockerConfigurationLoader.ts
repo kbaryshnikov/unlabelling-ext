@@ -10,17 +10,12 @@ export interface BlockerConfigurationReplacements {
     replaceHtml: string;
 }
 
-export interface BlockerConfigurationPetitionSignerOrgs {
-    name: string;
-    title: string;
-    titleAccusative: string;
-    websiteUrl: string;
-}
+export type BlockerConfigurationSubstitutions = Record<string, string>;
 
 export interface BlockerConfigurationLoaderResult {
     selectors: BlockerConfigurationSelectorsSet[];
     replacements: BlockerConfigurationReplacements;
-    petitionSignerOrgs: BlockerConfigurationPetitionSignerOrgs[];
+    substitutions: BlockerConfigurationSubstitutions[];
 }
 
 export abstract class BlockerConfigurationLoader {

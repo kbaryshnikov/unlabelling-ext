@@ -1,6 +1,6 @@
 import {
     BlockerConfigurationLoader,
-    BlockerConfigurationLoaderResult, BlockerConfigurationPetitionSignerOrgs,
+    BlockerConfigurationLoaderResult, BlockerConfigurationSubstitutions,
     BlockerConfigurationReplacements,
 } from "./BlockerConfigurationLoader";
 import {SelectorConfiguration} from "../../lib/SelectorConfiguration";
@@ -13,7 +13,7 @@ export class BlockerConfiguration {
 
     private map: Map<string, SelectorConfiguration[] | undefined> = new Map();
     private replacements: BlockerConfigurationReplacements | undefined = undefined;
-    private petitionSigners: BlockerConfigurationPetitionSignerOrgs[] | undefined = undefined;
+    private petitionSigners: BlockerConfigurationSubstitutions[] | undefined = undefined;
 
     constructor(private readonly loader: BlockerConfigurationLoader,
                 private readonly storage: BlockerConfigurationStorage,
@@ -42,7 +42,7 @@ export class BlockerConfiguration {
         }
         this.map.clear();
         this.replacements = result.replacements;
-        this.petitionSigners = result.petitionSignerOrgs;
+        this.petitionSigners = result.substitutions;
         for (const row of result.selectors) {
             this.map.set(row.domainName, row.selectors);
         }
