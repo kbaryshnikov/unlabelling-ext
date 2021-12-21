@@ -3,6 +3,8 @@ import {ElementRewriterType} from "../../../lib/ElementRewriterType";
 
 export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplacer> {
 
+    private static RANDOM_REPLACEMENT_IDX_KEY = 'ibsubstidx';
+
     readonly type = ElementRewriterType.TextReplacer;
 
     private normalizedSearchTexts: string[] | undefined;
@@ -28,7 +30,7 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
         }
 
         const textNode = this.findReplacementTextNode(element);
-        const replacementHtml = this.generateReplacementHtml();
+        const replacementHtml = this.generateReplacementHtml(element);
 
         if (textNode?.parentNode) {
             const replacement = document.createElement('span');
@@ -46,12 +48,25 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
         }
     }
 
-    private generateReplacementHtml(): string {
+    private generateReplacementHtml(element: Element): string {
         if (!this.substitutions) {
             return this.replacementHtml!;
         }
-        const randomIndex = Math.floor(Math.random() * this.substitutions.length);
+        let randomIndex: number = -1;
+        if (element instanceof HTMLElement) {
+            const idx = element.dataset[TextReplacer.RANDOM_REPLACEMENT_IDX_KEY];
+            if (idx !== undefined) {
+                randomIndex = parseInt(idx, 10);
+            }
+        }
+        const isValidIndex = (randomIndex >= 0 && randomIndex < this.substitutions.length);
+        if (!isValidIndex) {
+            randomIndex = Math.floor(Math.random() * this.substitutions.length);
+        }
         const substitition = this.substitutions[randomIndex];
+        if (element instanceof HTMLElement) {
+            element.dataset[TextReplacer.RANDOM_REPLACEMENT_IDX_KEY] = `${randomIndex}`;
+        }
         return this.replacementHtml!.replace(/\${([\w\d_]+)}/ig, (match, key) => substitition[key] ?? match);
     }
 
