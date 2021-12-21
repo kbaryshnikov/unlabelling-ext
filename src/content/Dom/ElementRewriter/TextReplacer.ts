@@ -28,7 +28,6 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
         }
 
         const textNode = this.findReplacementTextNode(element);
-        console.log('replacing');
         const replacementHtml = this.generateReplacementHtml();
 
         if (textNode?.parentNode) {
@@ -36,7 +35,6 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
             textNode.parentNode.insertBefore(replacement, textNode);
             textNode.parentNode.removeChild(textNode);
             replacement.outerHTML = replacementHtml!;
-            console.log('replace1', replacement.outerHTML);
             return replacement;
         } else {
             const marker = document.createElement('span');
@@ -44,7 +42,6 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
             marker.style.visibility = 'none';
             element.innerHTML = replacementHtml!;
             element.appendChild(marker);
-            console.log('replace2', element.innerHTML);
             return marker;
         }
     }
@@ -55,7 +52,6 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
         }
         const randomIndex = Math.floor(Math.random() * this.substitutions.length);
         const substitition = this.substitutions[randomIndex];
-        console.log(99, substitition);
         return this.replacementHtml!.replace(/\${([\w\d_]+)}/ig, (match, key) => substitition[key] ?? match);
     }
 
@@ -67,7 +63,6 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
             for (const child of element.childNodes) {
                 switch (child.nodeType) {
                     case Node.TEXT_NODE:
-                        console.log(child.textContent);
                         if (this.textNodeContainsSearchText(child as Text)) {
                             return child as Text;
                         }
