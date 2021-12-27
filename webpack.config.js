@@ -1,9 +1,23 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 
-const copyFrom = [
-    'node_modules/webextension-polyfill/dist/browser-polyfill.min.js',
-    'static',
+const copy = [
+    {
+        from: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js',
+        to: 'browser-polyfill.min.js',
+    },
+    {
+        from: 'src/manifest.json',
+        to: 'manifest.json',
+    },
+    {
+        from: 'src/popup/index.html',
+        to: 'popup.html',
+    },
+    {
+        from: 'static/icons/*.png',
+        to: '[name].png',
+    }
 ];
 
 const common = {
@@ -17,13 +31,21 @@ const common = {
             test: /.ts$/,
             use: 'ts-loader',
             exclude: /node_modules/,
+        }, {
+            test: /\.less$/,
+            exclude: /node_modules/,
+            use: ['style-loader', 'css-loader', 'less-loader'],
+        }, {
+            test: /\.html$/,
+            exclude: /node_modules/,
+            use: ['raw-loader'],
         }],
     },
     resolve: {
-        extensions: ['.ts'],
+        extensions: ['.ts', '.less', '.html'],
     },
     plugins: [
-        new CopyPlugin({patterns: copyFrom.map(from => ({from}))}),
+        new CopyPlugin({patterns: copy}),
     ],
     output: {
         filename: '[name].js',

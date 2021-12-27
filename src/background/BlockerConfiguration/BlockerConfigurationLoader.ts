@@ -12,10 +12,15 @@ export interface BlockerConfigurationReplacements {
 
 export type BlockerConfigurationSubstitutions = Record<string, string>;
 
+export interface BlockerConfigurationStats {
+    inoagentsCount: number;
+}
+
 export interface BlockerConfigurationLoaderResult {
     selectors: BlockerConfigurationSelectorsSet[];
     replacements: BlockerConfigurationReplacements;
     substitutions: BlockerConfigurationSubstitutions[];
+    stats: BlockerConfigurationStats;
 }
 
 export abstract class BlockerConfigurationLoader {

@@ -20,5 +20,11 @@
   ],
   "browser_action": {
     "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "active_16.png",
+    "32": "active_32.png",
+    "48": "active_48.png",
+    "128": "active_128.png"
   }
 }

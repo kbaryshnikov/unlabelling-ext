@@ -5,6 +5,9 @@ import {ContentScriptPort} from "./ContentScriptPort";
 import {Message} from "../lib/Message/Message";
 import {BatchMessage} from "../lib/Message/BatchMessage";
 import {UpdateReplacementsMessage} from "../lib/Message/UpdateReplacementsMessage";
+import {SettingsManager} from "./SettingsManager";
+import {StatsResponsePayload} from "../lib/Request/StatsResponse";
+import {IsEnabledResponsePayload} from "../lib/Request/IsEnabledResponse";
 
 export class TabsListener {
 
@@ -14,7 +17,8 @@ export class TabsListener {
     private ports: Map<number, ContentScriptPort> = new Map();
     private initMessages: Map<number, Message<any, any>> = new Map();
 
-    constructor(private readonly blockerConfiguration: BlockerConfiguration) {
+    constructor(private readonly blockerConfiguration: BlockerConfiguration,
+                private readonly settingsManager: SettingsManager) {
     }
 
     listen() {
@@ -27,6 +31,9 @@ export class TabsListener {
 
     onPortConnected(port: ContentScriptPort, url: string | undefined) {
         this.ports.set(port.tabId, port);
+        if (!this.settingsManager.isEnabled) {
+            return;
+        }
         const initMessage = this.initMessages.get(port.tabId);
         if (initMessage) {
             this.initMessages.delete(port.tabId);
@@ -36,13 +43,47 @@ export class TabsListener {
         }
     }
 
+    // noinspection JSUnusedGlobalSymbols
+    async onRequestStats(): Promise<StatsResponsePayload> {
+        return this.blockerConfiguration.stats;
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    async onRequestIsEnabled(isEnabled: boolean | undefined): Promise<IsEnabledResponsePayload> {
+        if (isEnabled !== undefined) {
+            const isChanged = await this.settingsManager.setIsEnabled(isEnabled);
+            console.log(isChanged)
+            if (isChanged) {
+                if (this.settingsManager.isEnabled) {
+                    const tabs = await browser.tabs.query({active: true, currentWindow: true});
+                    for (const tab of tabs) {
+                        if (tab?.id && tab?.url) {
+                            this.testTab(tab.id, tab.url);
+                        }
+                    }
+                } else {
+                    this.shutdownAllTabs().catch(error => console.error(error));
+                }
+            }
+        }
+        return this.settingsManager.isEnabled;
+    }
+
+    private async shutdownAllTabs(): Promise<void> {
+        await Promise.all(
+            Array.from(this.tabs).map(tabId => this.shutdownTab(tabId))
+        );
+    }
+
     private setupListener() {
         browser.tabs.onUpdated.addListener(this.onTabUpdated.bind(this));
-        browser.tabs.onRemoved.addListener(tabId => {
-            this.tabs.delete(tabId);
-            this.ports.delete(tabId);
-            this.initMessages.delete(tabId);
-        });
+        browser.tabs.onRemoved.addListener(tabId => this.cleanup(tabId));
+    }
+
+    private cleanup(tabId: number) {
+        this.tabs.delete(tabId);
+        this.ports.delete(tabId);
+        this.initMessages.delete(tabId);
     }
 
     private onTabUpdated(tabId: number, info: Tabs.OnUpdatedChangeInfoType, tab: Tabs.Tab) {
@@ -55,6 +96,9 @@ export class TabsListener {
     }
 
     private testTab(tabId: number, url: string) {
+        if (!this.settingsManager.isEnabled) {
+            return;
+        }
         if (this.findSelectorsAndConfigureContentScript(tabId, url)) {
             this.tabs.add(tabId);
         } else if (this.tabs.has(tabId)) {
