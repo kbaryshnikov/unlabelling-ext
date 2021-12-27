@@ -1,7 +1,7 @@
 import {
     BlockerConfigurationLoader,
     BlockerConfigurationLoaderResult, BlockerConfigurationSubstitutions,
-    BlockerConfigurationReplacements,
+    BlockerConfigurationReplacements, BlockerConfigurationStats,
 } from "./BlockerConfigurationLoader";
 import {SelectorConfiguration} from "../../lib/SelectorConfiguration";
 import {BlockerConfigurationStorage} from "./BlockerConfigurationStorage";
@@ -14,6 +14,7 @@ export class BlockerConfiguration {
     private map: Map<string, SelectorConfiguration[] | undefined> = new Map();
     private replacements: BlockerConfigurationReplacements | undefined = undefined;
     private petitionSigners: BlockerConfigurationSubstitutions[] | undefined = undefined;
+    private blockerStats: BlockerConfigurationStats | undefined = undefined;
 
     constructor(private readonly loader: BlockerConfigurationLoader,
                 private readonly storage: BlockerConfigurationStorage,
@@ -46,6 +47,7 @@ export class BlockerConfiguration {
         for (const row of result.selectors) {
             this.map.set(row.domainName, row.selectors);
         }
+        this.blockerStats = result.stats;
     }
 
     private async doLoad(): Promise<BlockerConfigurationLoaderResult | undefined> {
@@ -70,6 +72,13 @@ export class BlockerConfiguration {
             throw new Error('Petition signers were not loaded');
         }
         return this.petitionSigners as Record<string, any>[];
+    }
+
+    public get stats(): BlockerConfigurationStats {
+        if (!this.blockerStats) {
+            throw new Error('Stats were not loaded');
+        }
+        return this.blockerStats;
     }
 
     find(normalizedDomainName: string): SelectorConfiguration[] | undefined {

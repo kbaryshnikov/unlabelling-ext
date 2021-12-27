@@ -2,6 +2,7 @@ import {Message} from "../lib/Message/Message";
 import {MessageType} from "../lib/Message/MessageType";
 import {TabsListener} from "./TabsListener";
 import {Runtime} from "webextension-polyfill";
+import {Response} from "../lib/Request/Response";
 
 export class Messenger {
 
@@ -10,6 +11,7 @@ export class Messenger {
 
     listen() {
         browser.runtime.onConnect.addListener(this.onPortConnected.bind(this));
+        browser.runtime.onMessage.addListener(this.onMessage.bind(this));
     }
 
     private onPortConnected(port: Runtime.Port) {
@@ -25,6 +27,28 @@ export class Messenger {
 
     sendMessageToPort<T extends MessageType, M extends Message<T, any>>(port: Runtime.Port, message: M) {
         port.postMessage(message);
+    }
+
+    private async onMessage(message: any) {
+        if (!(typeof message?.requestType === 'string')) {
+            return;
+        }
+        const methodName = 'onRequest' + message.requestType;
+        if (typeof ((this.tabsListener as any)[methodName]) !== 'function') {
+            return;
+        }
+        try {
+            const responsePayload: any = await (this.tabsListener as any)[methodName](message.payload);
+            if (responsePayload !== undefined) {
+                const response: Response<any, any> = {
+                    responseType: message.requestType,
+                    payload: responsePayload,
+                };
+                return response;
+            }
+        } catch (e) {
+            console.error(e);
+        }
     }
 
 }

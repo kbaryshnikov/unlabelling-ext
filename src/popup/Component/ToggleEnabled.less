@@ -1,0 +1,68 @@
+@import "../definitions";
+.c-toggle-enabled {
+    display: block;
+    text-align: center;
+
+    &__toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 5px 0;
+        &--enabled {
+            color: green;
+        }
+    }
+
+    &__toggle-label {
+        cursor: pointer;
+        font-weight: @font-weight-bold;
+        font-size: 1.18rem;
+        letter-spacing: 0.1em;
+    }
+
+    &__toggle-label--on {
+        color: @color-text-off;
+    }
+    &__toggle-label--off {
+        color: @color-text;
+    }
+
+    &__toggle--enabled &__toggle-label--on {
+        color: @color-text;
+    }
+    &__toggle--enabled &__toggle-label--off {
+        color: @color-text-off;
+    }
+
+
+    &__toggle &__toggle-state--on {
+        visibility: hidden;
+    }
+    &__toggle--enabled &__toggle-state--on {
+        visibility: visible;
+    }
+    &__toggle &__toggle-state--off {
+        visibility: visible;
+    }
+    &__toggle--enabled &__toggle-state--off {
+        visibility: hidden;;
+    }
+
+    &__toggle-switch {
+        position: relative;
+        margin: 0 10px;
+        cursor: pointer;
+    }
+
+    &__toggle-state {
+        position: absolute;
+        top: 5px;
+        z-index: 1;
+        &--on {
+            left: 6px;
+        }
+        &--off {
+            right: 6px;
+        }
+    }
+}
