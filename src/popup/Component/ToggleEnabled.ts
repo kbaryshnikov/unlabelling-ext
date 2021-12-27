@@ -35,12 +35,10 @@ export class ToggleEnabled extends Component<'ToggleEnabled'> {
     }
 
     queryIsEnabled(payload: boolean | undefined = undefined) {
-        console.log('query')
         this.messenger.query<RequestType.IsEnabled, IsEnabledRequestPayload, IsEnabledResponsePayload>({
             requestType: RequestType.IsEnabled,
             payload,
         }).then(result => {
-            console.log(result)
             result === undefined || this.setIsEnabled(result);
         });
     }

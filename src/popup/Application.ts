@@ -11,7 +11,6 @@ export class Application {
             ...controllers,
             [controller.type]: controller,
         }), {});
-        console.log(this.controllers);
     }
 
     start() {
@@ -20,7 +19,6 @@ export class Application {
 
     process(node: HTMLElement) {
         const queue: HTMLElement[] = [node];
-        console.log(queue);
         while (queue.length) {
             const node = queue.pop()!;
             for (const child of node.querySelectorAll(Component.SELECTOR)) {

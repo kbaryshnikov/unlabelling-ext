@@ -52,7 +52,6 @@ export class TabsListener {
     async onRequestIsEnabled(isEnabled: boolean | undefined): Promise<IsEnabledResponsePayload> {
         if (isEnabled !== undefined) {
             const isChanged = await this.settingsManager.setIsEnabled(isEnabled);
-            console.log(isChanged)
             if (isChanged) {
                 if (this.settingsManager.isEnabled) {
                     const tabs = await browser.tabs.query({active: true, currentWindow: true});
