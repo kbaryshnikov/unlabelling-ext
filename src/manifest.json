@@ -1,7 +1,8 @@
 {
-  "name": "inoblock",
+  "name": "__MSG_appName__",
   "version": "1.0.0",
-  "description": "\"Inoagent\" messages blocker",
+  "default_locale": "en",
+  "description": "__MSG_appDesc__",
   "manifest_version": 2,
   "permissions": [
     "storage",

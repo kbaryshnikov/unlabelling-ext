@@ -20,17 +20,35 @@ export abstract class Component<T extends string> {
         this.node.innerHTML = this.html;
 
         this.initEventHandlers();
+        this.initI18n();
     }
 
     protected initEventHandlers() {
-        for (const node of this.node.querySelectorAll('[data-on]')) {
-            for (const [eventName, fnName] of Component.parseEventHandlersConfig((node as HTMLElement).dataset['on'] as string)) {
+        for (const node of this.node.querySelectorAll<HTMLElement>('[data-on]')) {
+            for (const [eventName, fnName] of Component.parseEventHandlersConfig(node.dataset['on'] as string)) {
                 node.addEventListener(eventName, event => {
                     if (undefined === (this as any)[fnName](event, node)) {
                         event.preventDefault();
                         event.stopPropagation();
                     }
                 });
+            }
+        }
+    }
+
+    protected initI18n() {
+        for (const node of this.node.querySelectorAll<HTMLElement>('[data-msg]')) {
+            const tokens = node.dataset['msg']!.split('|');
+            const msgKey = tokens.shift()!;
+            const translation = browser.i18n.getMessage(msgKey, tokens);
+            if (!translation) {
+                node.innerText = '[' + msgKey + ']';
+                continue;
+            }
+            if (msgKey.endsWith('HTML')) {
+                node.innerHTML = translation;
+            } else {
+                node.innerText = translation;
             }
         }
     }

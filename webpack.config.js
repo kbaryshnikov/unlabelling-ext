@@ -17,7 +17,11 @@ const copy = [
     {
         from: 'static/icons/*.png',
         to: '[name].png',
-    }
+    },
+    {
+        from: '_locales/',
+        to: '_locales/',
+    },
 ];
 
 const common = {

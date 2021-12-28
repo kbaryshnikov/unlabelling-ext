@@ -21,14 +21,12 @@ export class Application {
         const queue: HTMLElement[] = [node];
         while (queue.length) {
             const node = queue.pop()!;
-            for (const child of node.querySelectorAll(Component.SELECTOR)) {
-                if (child instanceof HTMLElement) {
-                    const type = child.dataset[Component.DATASET_KEY];
-                    if (type && type in this.controllers) {
-                        const ctrl = this.constructCtor(this.controllers[type], child);
-                        ctrl.init();
-                        queue.push(child);
-                    }
+            for (const child of node.querySelectorAll<HTMLElement>(Component.SELECTOR)) {
+                const type = child.dataset[Component.DATASET_KEY];
+                if (type && type in this.controllers) {
+                    const ctrl = this.constructCtor(this.controllers[type], child);
+                    ctrl.init();
+                    queue.push(child);
                 }
             }
         }

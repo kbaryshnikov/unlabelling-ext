@@ -111,8 +111,8 @@ export class DomWatcher {
 
     private applyStyleTweaks(selectorConfig: SelectorConfiguration) {
         selectorConfig.styleTweaks?.forEach(tweak => {
-            const elements = document.documentElement.querySelectorAll(tweak.selector);
-            elements.forEach(element => element instanceof HTMLElement && Object.assign(element.style, tweak.styles));
+            const elements = document.documentElement.querySelectorAll<HTMLElement>(tweak.selector);
+            elements.forEach(element => Object.assign(element.style, tweak.styles));
         });
     }
 
