@@ -1,5 +1,6 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
+const TerserPlugin = require("terser-webpack-plugin");
 
 const copy = [
     {
@@ -51,6 +52,19 @@ const common = {
     plugins: [
         new CopyPlugin({patterns: copy}),
     ],
+    optimization: {
+        minimize: true,
+        minimizer: [
+            new TerserPlugin({
+                terserOptions: {
+                    format: {
+                        comments: false,
+                    },
+                },
+                extractComments: false,
+            }),
+        ],
+    },
     output: {
         filename: '[name].js',
         path: path.resolve(__dirname, 'dist'),
