@@ -13,7 +13,7 @@ export class BlockerConfiguration {
 
     private map: Map<string, SelectorConfiguration[] | undefined> = new Map();
     private replacements: BlockerConfigurationReplacements | undefined = undefined;
-    private petitionSigners: BlockerConfigurationSubstitutions[] | undefined = undefined;
+    private subst: BlockerConfigurationSubstitutions[] | undefined = undefined;
     private blockerStats: BlockerConfigurationStats | undefined = undefined;
 
     constructor(private readonly loader: BlockerConfigurationLoader,
@@ -43,7 +43,7 @@ export class BlockerConfiguration {
         }
         this.map.clear();
         this.replacements = result.replacements;
-        this.petitionSigners = result.substitutions;
+        this.subst = result.substitutions;
         for (const row of result.selectors) {
             this.map.set(row.domainName, row.selectors);
         }
@@ -68,10 +68,10 @@ export class BlockerConfiguration {
     }
 
     public get substitutions(): Record<string, string>[] {
-        if (!this.petitionSigners) {
+        if (!this.subst) {
             throw new Error('Petition signers were not loaded');
         }
-        return this.petitionSigners as Record<string, any>[];
+        return this.subst as Record<string, any>[];
     }
 
     public get stats(): BlockerConfigurationStats {
