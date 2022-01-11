@@ -1,7 +1,7 @@
 {
-  "name": "inoblock",
+  "name": "unlabelling",
   "version": "1.0.0",
-  "description": "\"Inoagent\" messages blocker",
+  "description": "Abolish labels of 'foreign agents' media",
   "main": "background.ts",
   "scripts": {
     "build": "NODE_ENV=production webpack",
@@ -9,7 +9,7 @@
     "watch": "NODE_ENV=development webpack --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Konstantin Baryshnikov",
+  "author": "OVD-Info",
   "license": "ISC",
   "devDependencies": {
     "@types/webextension-polyfill": "^0.8.0",
