@@ -20,4 +20,4 @@ Now we determine the reality ourselves, starting with the abolition of labelling
 * [Петиция против законов об «иноагентах»](https://www.change.org/agents_of_people)
 * [Инотека](https://ovdinfo.org/inoteka)
 * [Доклад о дискриминационных аспектах «иноагентского» законодательства](https://ovdinfo.org/reports/sozdano-i-ili-rasprostraneno)
-* [Законопроект и пояснительная записка] (https://ovdinfo.org/reports/poyasnitelnaya-zapiska-i-zakonoproekt)
+* [Законопроект и пояснительная записка](https://ovdinfo.org/reports/poyasnitelnaya-zapiska-i-zakonoproekt)
