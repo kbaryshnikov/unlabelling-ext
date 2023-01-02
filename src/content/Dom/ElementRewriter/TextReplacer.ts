@@ -4,17 +4,26 @@ import {ElementRewriterType} from "../../../lib/ElementRewriterType";
 export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplacer> {
 
     private static RANDOM_REPLACEMENT_IDX_KEY = 'ibsubstidx';
+    private static TOKEN_SEPARATOR = '*';
 
     readonly type = ElementRewriterType.TextReplacer;
 
-    private normalizedSearchTexts: string[] | undefined;
+    private normalizedSearchTexts: Array<{length: number, tokens: string[]}> | undefined;
     private normalizedSearchTextsMinLen: number = 0;
     private replacementHtml: string | undefined;
     private substitutions: Record<string, string>[] | undefined = undefined;
 
     configure(searchTexts: string[], replacementHtml: string, substitutions: Record<string, string>[]) {
-        this.normalizedSearchTexts = searchTexts.map(searchText => TextReplacer.normalizeText(searchText));
-        this.normalizedSearchTextsMinLen = Math.min(...this.normalizedSearchTexts.map(s => s.length));
+        this.normalizedSearchTexts = searchTexts.map(s => {
+            let length = 0;
+            const tokens = s.split(TextReplacer.TOKEN_SEPARATOR).map(s => s.trim()).filter(s => s.length).map(token => {
+                const normalizedToken = TextReplacer.normalizeText(token);
+                length += normalizedToken.length + 1;
+                return normalizedToken;
+            });
+            return {length, tokens};
+        }).filter(s => s.tokens.length);
+        this.normalizedSearchTextsMinLen = Math.min(...this.normalizedSearchTexts.map(t => t.length));
         this.replacementHtml = replacementHtml;
         this.substitutions = substitutions;
     }
@@ -99,8 +108,28 @@ export class TextReplacer extends ElementRewriter<ElementRewriterType.TextReplac
 
         const normalizedNodeText = TextReplacer.normalizeText(textContent);
 
-        for (let nst of this.normalizedSearchTexts!) {
-            if (normalizedNodeText.length >= nst.length && normalizedNodeText.includes(nst)) {
+        for (const variant of this.normalizedSearchTexts!) {
+            if (normalizedNodeText.length < variant.length) {
+                break;
+            }
+            let s = normalizedNodeText;
+            let foundCounter = 0;
+            let pos = 0;
+            for (const token of variant.tokens) {
+                if (pos > 0) {
+                    s = s.substr(pos);
+                }
+                if (s.length < token.length) {
+                    break;
+                }
+                const idx = s.indexOf(token);
+                if (!~idx) {
+                    break;
+                }
+                foundCounter++;
+                pos = idx + token.length;
+            }
+            if (foundCounter == variant.tokens.length) {
                 return true;
             }
         }
